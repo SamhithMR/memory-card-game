@@ -1,0 +1,40 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.cards {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0.6rem;
+    width: 50%;
+}
+.card {
+    height: 10rem;
+    width:10rem;
+    transition: transform 1s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+  
+  .card-front, .card-back {
+    backface-visibility: hidden;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 5px;
+  }
+  
+  .card-back {
+    transform: rotateY(180deg);
+  }
+  
+  /* .card:hover {
+    transform: rotateY(180deg);
+  } */
+  
+  
