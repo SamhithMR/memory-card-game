@@ -1,73 +1,122 @@
-// const cardHTML = `
-//   <div class="card">
-//     <img src="./assets/logo.png" alt="" class="card-front">
-//     <img src="./assets/red_bog.png" alt="" class="card-back">
-//   </div>
-// `;
+let gameBoard = document.querySelector(".cards");
+let cardImages = ["hiro.png", "red_bog.png", "tadashi.png", "yellow_bog.png"];
+let shuffledDeck = [];
 
-let cards = document.querySelector(".cards");
-let source = ["hiro.png", "red_bog.png", "tadashi.png", "yellow_bog.png"]
-let arr = []
+function shuffleCards() {
+    while (shuffledDeck.length < 12) {
+        // calculate the frequency of each elements
+        let frequencyMap = shuffledDeck.reduce((prev, cur) => {
+            prev[cur] = (prev[cur] || 0) + 1;
+            return prev;
+        }, {});
+        let randomImage = cardImages[Math.floor(Math.random() * 4)];
+        // / Add the image to the shuffledDeck array, ensuring that each image is used no more than 3 times
+        if (!frequencyMap[randomImage] || frequencyMap[randomImage] < 3) {
+            shuffledDeck.push(randomImage);
+        }
+    }
 
-// we need 12 cards so loop 12 times
-while (arr.length < 12) {
-    // calculate frequency of the perticular image
-    var map = arr.reduce((prev, cur) => {
-        prev[cur] = (prev[cur] || 0) + 1;
-        return prev;
-    }, {});
-
-    let element = source[Math.floor(Math.random() * 4)];
-    
-    // push the images into arr array, where each type of image must not be more that 3 times
-    if (!map[element] || map[element] < 3) {
-        arr.push(element);
+    // Generate the HTML for each card
+    for (let i = 0; i < 12; i++) {
+        gameBoard.innerHTML += `
+      <div class="card">
+        <img src="./assets/logo.png" alt="" class="card-front">
+        <img src="./assets/${shuffledDeck[i]}" alt="" class="card-back">
+        </div>
+        `;
     }
 }
 
-// create 12 cards with random images
-for (let i = 0; i < 12; i++) {
-    cards.innerHTML += `
-  <div class="card">
-    <img src="./assets/logo.png" alt="" class="card-front">
-    <img src="./assets/${arr[i]}" alt="" class="card-back">
-    </div>
-    `;
+// Call the shuffleCards function when the page loads
+window.onload = shuffleCards();
+window.onload = initializeGame();
+
+var confettiElement = document.querySelector("#my-canvas");
+        var confettiSettings = { target: confettiElement };
+        var confetti = new ConfettiGenerator(confettiSettings);
+        confetti.render();
+
+let scores = document.querySelector('.score')
+let clicks = document.querySelector('.clicks')
+let timer = document.querySelector('.timer')
+var tim;
+
+function setinterval(){
+    tim = setInterval(()=>(timer.textContent = Number(timer.textContent)+1), 1000)
 }
 
-let card = document.querySelector(".card");
-let count = 0;
-let cardsList = document.querySelectorAll(".card")
-let arr2 = []
+function initializeGame() {
+    let startTime, endTime, totalClicks = 0;
 
-// add event listner to all the cards
-
-cardsList.forEach((x) => x.addEventListener("click",
-    () => {
-        // on clicking the card rotate the card
-        x.style.transform = `rotateY(180deg)`
-
-        // keep a timer to keep track of the number of cards clicked
-        count += 1;
-
-        // append the sources of image(name of the card) into array "arr2"
-        arr2.push(x.children[1].src)
-        console.log(arr2);
-
-        if (count >= 3) {
-
-            // check if the array hav same elements
-            if ((arr2.every((val, i, arr) => val === arr[0]))) {
-                arr2 = []
-                count = 0 
-            } 
-            else {
-                arr2 = []
-                count = 0;
-                setTimeout(() => (cardsList.forEach((x) => x.style.transform = `rotateY(0deg)`)), 1000)
+    let clickCount = 0; // Counter to keep track of the number of cards clicked
+    let allCards = document.querySelectorAll(".card"); // Select all the card elements
+    let imageSources = []; // Array to store the sources of the clicked cards
+    let flippedCards = []; // Array to store the clicked card elements
+    
+    // Function to handle the card click events
+    allCards.forEach((card) => {
+        // Add an event listener for clicking on each card
+        card.addEventListener("click", () => {
+            // Start the timer on the first card click
+            if (totalClicks === 0) {
+                startTime = Date.now();
+                setinterval()
+            }
+            totalClicks +=1;
+            // Rotate the card by 180 degrees on click
+            card.style.transform = `rotateY(180deg)`;
+            // Increment the click count
+            clickCount += 1;
+            // Add the source of the clicked card's image to the `imageSources` array
+            imageSources.push(card.children[1].src);
+            // Add the clicked card to the `flippedCards` array
+            flippedCards.push(card);
+            // If three cards have been clicked
+            if (clickCount >= 3) {
+                // Check if all three image sources are the same
+                if ((imageSources.every((val) => val === imageSources[0]))) {
+                    // Clear the `imageSources` and `flippedCards` arrays and reset the click count
+                    imageSources = [];
+                    flippedCards = [];
+                    clickCount = 0;
+                } else {
+                    // Wait for 900ms and rotate the cards back to their original position
+                    setTimeout(() => (flippedCards.forEach((card) => card.style.transform = `rotateY(0deg)`)), 900);
+                    // Clear the `imageSources` array and reset the click count
+                    clickCount = 0;
+                    imageSources = [];
+                }
             }
 
+            let score=0;
+            endTime = new Date();
+            let timeTaken = (endTime - startTime) / 1000; // in seconds
+            score =( 100 - (totalClicks + timeTaken)).toFixed(0);
+            
+            scores.textContent=score
+            clicks.textContent=totalClicks
+           
+            if((Array.from(allCards)).every((x) => x.style.transform  == `rotateY(180deg)`)){
+               setTimeout(()=>(confettiElement.style.display = `block`),500)
+               clearInterval(tim)
+            }
+        });
+    });
+    
+}
 
-        }
+function resetGame() {
+    confettiElement.style.display = `none`
+    scores.innerHTML = 100;
+    clicks.innerHTML = 0;
+    timer.innerHTML = 0;
+    clearInterval(tim)
+    document.querySelector('.timer').innerHTML = 0;
+    gameBoard.innerHTML = ``;
+    shuffledDeck = [];
+    shuffleCards();
+    initializeGame();
+}
 
-    }))
+
+

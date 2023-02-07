@@ -12,8 +12,20 @@
 <body>
     <div class="container">
         <div class="cards"></div>
+        <div class="results">
+            <h1>timer:<span class="timer">0</span></h1>
+            <h1>clicks:<span class="clicks">0</span></h1>
+            <h1>score:<span class="score">100</span></h1>
+            <button onclick="resetGame()">reset</button>
+        </div>
     </div>
+    <canvas id="my-canvas"></canvas>
 </body>
-<script src="./script.js"></script>
 
+<!-- this script file is from agezao to generate a random confetti -->
+<!-- https://github.com/Agezao/confetti-js -->
+<script src="./index.main.js"></script>
+
+<!-- link to my script file -->
+<script src="./script.js"></script>
 </html>
